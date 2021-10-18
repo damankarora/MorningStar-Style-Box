@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './StyleBox.css'
 import { Grid, Container, Autocomplete, TextField } from '@mui/material'
+import OurBox from './OurBox';
 
 // false details of mutual funds
 const mutualFundList = [
@@ -28,19 +29,65 @@ class HomePage extends Component {
             mutualFundProfit: 0
         }
         this.handlechange = this.handlechange.bind(this);
-    }
+    }    
 
     handlechange(event, values) {
+        console.log("called");
         this.setState({
             mutualFundName: values
         }, () => {
-            const selectedFund = mutualFundList.find(obj => obj.name === this.state.mutualFundName)
+            const selectedFund = mutualFundList.find(({name}) => name === this.state.mutualFundName)
             this.setState({
                 mutualFundMarketCap: selectedFund?.marketCap ?? 0,
                 mutualFundProfit: selectedFund ? selectedFund.PE / selectedFund.PB : 0
             })
         }
         )
+    }
+
+    getHighlightId(mutualFundMarketCap, mutualFundProfit){
+        if(mutualFundList === 0 || mutualFundProfit === 0){
+            return {x: -1, y: -1};
+        }
+        let x;
+        let y;
+        if(mutualFundMarketCap > 7000){
+            x = 0;
+        }
+        else if(mutualFundMarketCap >= 500 && mutualFundMarketCap <= 7000){
+            x = 1;
+        }
+        else{
+            x = 2;
+        }
+
+        if(mutualFundProfit < 1.25){
+            y = 0;
+        }else if(mutualFundProfit >= 1.25 && mutualFundProfit <= 1.75){
+            y = 1;
+        }else{
+            y = 2;
+        }
+
+        return {x, y};
+    }
+
+    getValueBoxes(){
+        let {x, y} = this.getHighlightId(this.state.mutualFundMarketCap, this.state.mutualFundProfit);
+
+        let components = [];
+
+        let textLables = ['large', 'medium', 'small'];
+        
+        for(let i = 0; i < 3; i ++){
+            components.push(<div className="textbox" key={components.length}>{textLables[i]}</div>)
+                        
+            for(let j = 0; j < 3; j ++){
+                components.push(<OurBox highlight={(i === x && j === y)} key={components.length}/>)
+                
+            }
+        }
+        return components;
     }
 
     render() {
@@ -56,42 +103,13 @@ class HomePage extends Component {
                             </Container>
                         </Grid>
                         <Grid item lg={6}>
-                            <div class="w">
+                            <div className="w">
                                 <section>
                                     <div className="textbox"></div>
                                     <div className="textbox">value</div>
                                     <div className="textbox">blend</div>
                                     <div className="textbox">growth</div>
-                                    <div className="textbox">large</div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap > 7000 && this.state.mutualFundProfit < 1.25 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap > 7000 && this.state.mutualFundProfit >= 1.25 && this.state.mutualFundProfit <= 1.75 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap > 7000 && this.state.mutualFundProfit > 1.75 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div className="textbox">medium</div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap >= 500 && this.state.mutualFundMarketCap <= 7000 && this.state.mutualFundProfit < 1.25 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap >= 500 && this.state.mutualFundMarketCap <= 7000 && this.state.mutualFundProfit >= 1.25 && this.state.mutualFundProfit <= 1.75 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap >= 500 && this.state.mutualFundMarketCap <= 7000 && this.state.mutualFundProfit > 1.75 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div className="textbox">small</div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap < 500 && this.state.mutualFundProfit < 1.25 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap < 500 && this.state.mutualFundProfit >= 1.25 && this.state.mutualFundProfit <= 1.75 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
-                                    <div style={
-                                        (this.state.mutualFundMarketCap < 500 && this.state.mutualFundProfit > 1.75 && this.state.mutualFundProfit !== 0 && this.state.mutualFundMarketCap !== 0) ? { backgroundColor: 'black' } : {}
-                                    } className="box"></div>
+                                    {this.getValueBoxes()}
                                 </section>
                             </div>
                         </Grid>
@@ -99,8 +117,12 @@ class HomePage extends Component {
 
                 </Container>
             </>
+            
         )
     }
 }
+
+
+
 
 export default HomePage;
