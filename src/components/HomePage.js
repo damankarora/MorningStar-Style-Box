@@ -45,7 +45,7 @@ class HomePage extends Component {
     }
 
     getHighlightId(mutualFundMarketCap, mutualFundProfit){
-        if(mutualFundList === 0 || mutualFundProfit === 0){
+        if(mutualFundMarketCap === 0 || mutualFundProfit === 0){
             return {x: -1, y: -1};
         }
         let x;
