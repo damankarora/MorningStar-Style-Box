@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './StyleBox.css'
 import { Grid, Container, Autocomplete, TextField } from '@mui/material'
-import OurBox from './OurBox';
+import ValueBox from './ValueBox';
 
 // false details of mutual funds
 const mutualFundList = [
@@ -31,8 +31,7 @@ class HomePage extends Component {
         this.handlechange = this.handlechange.bind(this);
     }    
 
-    handlechange(event, values) {
-        console.log("called");
+    handlechange(event, values) {        
         this.setState({
             mutualFundName: values
         }, () => {
@@ -83,7 +82,7 @@ class HomePage extends Component {
             components.push(<div className="textbox" key={components.length}>{textLables[i]}</div>)
                         
             for(let j = 0; j < 3; j ++){
-                components.push(<OurBox highlight={(i === x && j === y)} key={components.length}/>)
+                components.push(<ValueBox highlight={(i === x && j === y)} key={components.length}/>)
                 
             }
         }
@@ -94,30 +93,38 @@ class HomePage extends Component {
 
         return (
             <>
-                <Container className="containerStyle" style={{ display: 'flex', width: '90vw', height: '90vh', alignItems: 'center' }}>
-                    <Grid container spacing={2}>
-                        <Grid item lg={6}>
-                            <Container maxWidth="md" style={{ marginTop: '5%' }}>
-                                <Autocomplete disablePortal id="combo-box-demo" onChange={this.handlechange} options={nameList} sx={{ width: 300, my: 2 }}
-                                    renderInput={(params) => <TextField {...params} label="Choose Mutual Fund" size="small" />} />
-                            </Container>
-                        </Grid>
-                        <Grid item lg={6}>
-                            <div className="w">
-                                <section>
-                                    <div className="textbox"></div>
-                                    <div className="textbox">value</div>
-                                    <div className="textbox">blend</div>
-                                    <div className="textbox">growth</div>
-                                    {this.getValueBoxes()}
-                                </section>
-                            </div>
-                        </Grid>
-                    </Grid>
-
-                </Container>
+                <HomePageView getValueBoxes={()=>(this.getValueBoxes())} handlechange={this.handlechange}/>   
             </>
             
+        )
+    }
+}
+
+// View
+class HomePageView extends Component{
+    render(){
+        return (
+            <Container className="containerStyle" style={{ display: 'flex', width: '90vw', height: '90vh', alignItems: 'center' }}>
+                <Grid container spacing={2}>
+                    <Grid item lg={6}>
+                        <Container maxWidth="md" style={{ marginTop: '5%' }}>
+                            <Autocomplete disablePortal id="combo-box-demo" onChange={this.props.handlechange} options={nameList} sx={{ width: 300, my: 2 }}
+                                renderInput={(params) => <TextField {...params} label="Choose Mutual Fund" size="small" />} />
+                        </Container>
+                    </Grid>
+                    <Grid item lg={6}>
+                        <div className="w">
+                            <section>
+                                <div className="textbox"></div>
+                                <div className="textbox">value</div>
+                                <div className="textbox">blend</div>
+                                <div className="textbox">growth</div>                                
+                                {this.props.getValueBoxes()}
+                            </section>
+                        </div>
+                    </Grid>
+                </Grid>
+            </Container>
         )
     }
 }
